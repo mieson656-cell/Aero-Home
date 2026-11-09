@@ -71,7 +71,7 @@ class MainActivity : Activity() {
         window.navigationBarColor = Color.rgb(0, 108, 154)
         window.decorView.systemUiVisibility = 0
         root = FrameLayout(this)
-        root.background = AeroBackground(this)
+        root.addView(AeroBackground(this), FrameLayout.LayoutParams(-1, -1))
         root.setOnApplyWindowInsetsListener { view, insets ->
             if (android.os.Build.VERSION.SDK_INT >= 30) {
                 val bars = insets.getInsets(android.view.WindowInsets.Type.systemBars())
@@ -167,7 +167,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.VERTICAL
             setPadding(0, 0, 0, dp(16))
         }
-        scroll.addView(content, ScrollView.LayoutParams(-1, -2))
+        scroll.addView(content, ViewGroup.LayoutParams(-1, -2))
         shell.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
 
         val header = LinearLayout(this).apply {
@@ -295,7 +295,7 @@ class MainActivity : Activity() {
             textSize = 15f
             setTextColor(0xFF155F7E.toInt())
             setHintTextColor(0xFF69A7BC.toInt())
-            singleLine = true
+            isSingleLine = true
             setPadding(dp(15), 0, dp(15), 0)
             background = glassDrawable(18)
             imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
@@ -303,7 +303,7 @@ class MainActivity : Activity() {
         shell.addView(search, LinearLayout.LayoutParams(-1, dp(49)).apply { topMargin = dp(15); bottomMargin = dp(12) })
         val scroll = ScrollView(this).apply { clipToPadding = false }
         val grid = GridLayout(this).apply { columnCount = 4; useDefaultMargins = false }
-        scroll.addView(grid, ScrollView.LayoutParams(-1, -2))
+        scroll.addView(grid, ViewGroup.LayoutParams(-1, -2))
         shell.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
         root.addView(shell, FrameLayout.LayoutParams(-1, -1))
 
