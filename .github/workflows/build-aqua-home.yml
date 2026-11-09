@@ -1,4 +1,5 @@
 name: Build Aqua Home APK
+# Rebuild after Kotlin source fixes
 
 on:
   workflow_dispatch:
