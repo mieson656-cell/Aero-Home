@@ -147,10 +147,15 @@ class MainActivity : Activity() {
             .sortedBy { it.label.lowercase(Locale.getDefault()) }
     }
 
+    private fun addAeroBackdrop() {
+        root.addView(AeroBackground(this), FrameLayout.LayoutParams(-1, -1))
+    }
+
     private fun renderHome(page: Int) {
         screen = Screen.HOME
         homePage = page.coerceIn(0, 1)
         root.removeAllViews()
+        addAeroBackdrop()
         clockView = null
         dateView = null
 
@@ -175,17 +180,17 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER_VERTICAL
         }
         val branding = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        branding.addView(text("AQUA HOME", 21f, Color.WHITE, true))
-        branding.addView(text("FRUTIGER AERO DESKTOP", 9f, 0xFFE5FAFF.toInt(), true).apply { letterSpacing = 0.14f })
+        branding.addView(text("AQUA  •  DESKTOP", 20f, Color.WHITE, true))
+        branding.addView(text("A BREATH OF FRESH AIR", 9f, 0xFFE5FAFF.toInt(), true).apply { letterSpacing = 0.18f })
         header.addView(branding, LinearLayout.LayoutParams(0, -2, 1f))
-        header.addView(actionPill("⚙  Настроить") { renderSettings() })
+        header.addView(actionPill("⚙  Параметры") { renderSettings() })
         content.addView(header)
 
         val clockCard = glassCard(22).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(20), dp(15), dp(20), dp(17))
         }
-        clockCard.addView(text(if (homePage == 0) "ДОБРО ПОЖАЛОВАТЬ" else "ТВОЁ ПРОСТРАНСТВО", 10f, 0xFF327D9D.toInt(), true))
+        clockCard.addView(text(if (homePage == 0) "ПОНЕДЕЛЬНИК НАЧИНАЕТСЯ ЗДЕСЬ" else "ТВОЯ ЦИФРОВАЯ СРЕДА", 10f, 0xFF327D9D.toInt(), true))
         val time = text("--:--", 52f, 0xFF075B83.toInt(), true)
         time.setShadowLayer(dp(5).toFloat(), 0f, dp(2).toFloat(), 0x44FFFFFF)
         clockView = time
@@ -193,7 +198,7 @@ class MainActivity : Activity() {
         val date = text("", 14f, 0xFF247697.toInt(), true)
         dateView = date
         clockCard.addView(date)
-        val micro = text("✦  Спокойного дня!  •  AQUA SYSTEM", 10f, 0xFF478DA8.toInt(), false).apply {
+        val micro = text("SKY  •  WATER  •  LIGHT", 9f, 0xFF478DA8.toInt(), true).apply {
             setPadding(0, dp(9), 0, 0)
         }
         clockCard.addView(micro)
@@ -208,7 +213,7 @@ class MainActivity : Activity() {
             setOnClickListener { renderDrawer(true) }
         }
         search.addView(text("⌕", 27f, 0xFF1388B1.toInt(), true))
-        search.addView(text("Поиск приложений", 14f, 0xFF377F9D.toInt(), false).apply {
+        search.addView(text("Найти приложение или открыть…", 14f, 0xFF377F9D.toInt(), false).apply {
             setPadding(dp(10), 0, 0, 0)
         }, LinearLayout.LayoutParams(0, -2, 1f))
         search.addView(text("ОТКРЫТЬ  ›", 9f, 0xFF2583A5.toInt(), true))
@@ -216,7 +221,7 @@ class MainActivity : Activity() {
         content.addView(search, searchParams)
 
         if (homePage == 0) {
-            sectionTitle(content, "БЫСТРЫЙ ДОСТУП", "ТВОИ ПРИЛОЖЕНИЯ")
+            sectionTitle(content, "ИЗБРАННОЕ", "БЫСТРЫЙ ДОСТУП")
             val favorites = favoriteApps(8)
             content.addView(appGrid(favorites, 4), LinearLayout.LayoutParams(-1, -2))
             val info = glassCard(18).apply {
@@ -226,10 +231,29 @@ class MainActivity : Activity() {
             }
             info.addView(text("◉", 27f, 0xFF1B9CC5.toInt(), true))
             val infoText = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(12), 0, 0, 0) }
-            infoText.addView(text("Aqua atmosphere", 14f, 0xFF176D91.toInt(), true))
-            infoText.addView(text("Стекло, вода и немного ностальгии", 10f, 0xFF4A8BA3.toInt(), false))
+            infoText.addView(text("A little more blue", 14f, 0xFF176D91.toInt(), true))
+            infoText.addView(text("Чистый воздух. Мягкий свет. Тихое море.", 10f, 0xFF4A8BA3.toInt(), false))
             info.addView(infoText, LinearLayout.LayoutParams(0, -2, 1f))
             content.addView(info, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
+            content.addView(sectionTitleView("СИСТЕМА", "БЫСТРЫЕ ПЕРЕХОДЫ"))
+            val quickRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            quickRow.addView(quickSetting("◉", "Wi-Fi", "СЕТЬ") {
+                try { startActivity(Intent(Settings.ACTION_WIFI_SETTINGS)) } catch (_: Exception) {}
+            }, LinearLayout.LayoutParams(0, dp(76), 1f).apply { marginEnd = dp(5) })
+            quickRow.addView(quickSetting("ᛒ", "Bluetooth", "УСТРОЙСТВА") {
+                try { startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS)) } catch (_: Exception) {}
+            }, LinearLayout.LayoutParams(0, dp(76), 1f).apply { marginStart = dp(5); marginEnd = dp(5) })
+            quickRow.addView(quickSetting("☼", "Экран", "ЯРКОСТЬ") {
+                try { startActivity(Intent(Settings.ACTION_DISPLAY_SETTINGS)) } catch (_: Exception) {}
+            }, LinearLayout.LayoutParams(0, dp(76), 1f).apply { marginStart = dp(5) })
+            content.addView(quickRow)
+            val nature = glassCard(20).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(15), dp(13), dp(15), dp(13))
+            }
+            nature.addView(text("THE AQUA EDITION", 9f, 0xFF2583A5.toInt(), true).apply { letterSpacing = 0.16f })
+            nature.addView(text("Светлое небо, зелёные холмы и прозрачная вода — знакомая эстетика цифрового будущего.", 12f, 0xFF397F99.toInt(), false).apply { setPadding(0, dp(5), 0, 0) })
+            content.addView(nature, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(10) })
         } else {
             sectionTitle(content, "МОЯ КОЛЛЕКЦИЯ", "ВСЕ УСТАНОВЛЕННЫЕ")
             content.addView(appGrid(favoriteApps(16), 4), LinearLayout.LayoutParams(-1, -2))
@@ -277,13 +301,14 @@ class MainActivity : Activity() {
     private fun renderDrawer(focusSearch: Boolean) {
         screen = Screen.DRAWER
         root.removeAllViews()
+        addAeroBackdrop()
         val shell = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(18), dp(16), dp(18), dp(12))
         }
         val top = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
         top.addView(actionPill("‹  Назад") { renderHome(homePage) })
-        top.addView(text("ПРИЛОЖЕНИЯ", 16f, Color.WHITE, true).apply {
+        top.addView(text("МОИ ПРИЛОЖЕНИЯ", 16f, Color.WHITE, true).apply {
             gravity = Gravity.CENTER
             setShadowLayer(dp(3).toFloat(), 0f, dp(1).toFloat(), 0x55005A86)
         }, LinearLayout.LayoutParams(0, -2, 1f))
@@ -345,12 +370,13 @@ class MainActivity : Activity() {
     private fun renderSettings() {
         screen = Screen.SETTINGS
         root.removeAllViews()
+        addAeroBackdrop()
         val shell = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(20), dp(18), dp(20), dp(20))
         }
         shell.addView(actionPill("‹  На рабочий стол") { renderHome(homePage) })
-        shell.addView(text("НАСТРОЙКИ AQUA HOME", 20f, Color.WHITE, true).apply {
+        shell.addView(text("ПАРАМЕТРЫ СРЕДЫ", 20f, Color.WHITE, true).apply {
             setPadding(0, dp(25), 0, dp(16))
             setShadowLayer(dp(3).toFloat(), 0f, dp(1).toFloat(), 0x55005A86)
         })
@@ -415,7 +441,7 @@ class MainActivity : Activity() {
         }
         val iconWrap = FrameLayout(this).apply {
             background = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-                intArrayOf(0xCCFFFFFF.toInt(), 0x66C9F4FF.toInt())).apply { cornerRadius = dp(17).toFloat(); setStroke(dp(1), 0xAAFFFFFF.toInt()) }
+                intArrayOf(0xF2FFFFFF.toInt(), 0xBDE4FAFF.toInt(), 0x99A8E6F2.toInt())).apply { cornerRadius = dp(17).toFloat(); setStroke(dp(1), 0xE6FFFFFF.toInt()) }
             elevation = dp(3).toFloat()
         }
         val image = ImageView(this).apply {
@@ -466,6 +492,29 @@ class MainActivity : Activity() {
         try {
             startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${app.packageName}")))
         } catch (_: Exception) { Toast.makeText(this, "Настройки приложения недоступны", Toast.LENGTH_SHORT).show() }
+    }
+
+    private fun sectionTitleView(title: String, subtitle: String): View {
+        val row = LinearLayout(this).apply { gravity = Gravity.BOTTOM; setPadding(dp(2), dp(18), dp(2), dp(7)) }
+        row.addView(text(title, 11f, Color.WHITE, true), LinearLayout.LayoutParams(0, -2, 1f))
+        row.addView(text(subtitle, 8f, 0xFFD9F5FF.toInt(), true))
+        return row
+    }
+
+    private fun quickSetting(symbol: String, title: String, caption: String, action: () -> Unit): View {
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            background = glassDrawable(17)
+            elevation = dp(3).toFloat()
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { action() }
+            setPadding(dp(4), dp(8), dp(4), dp(7))
+            addView(text(symbol, 22f, 0xFF1388B1.toInt(), true))
+            addView(text(title, 10f, 0xFF176D91.toInt(), true))
+            addView(text(caption, 7f, 0xFF4A8BA3.toInt(), true))
+        }
     }
 
     private fun sectionTitle(parent: LinearLayout, title: String, subtitle: String) {
@@ -522,59 +571,101 @@ class MainActivity : Activity() {
 }
 
 private class AeroBackground(context: Context) : View(context) {
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val density = resources.displayMetrics.density
+    private val p = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val d = resources.displayMetrics.density
+
+    private fun shape(canvas: Canvas, color: Int, build: Path.() -> Unit) {
+        p.shader = null; p.style = Paint.Style.FILL; p.color = color
+        canvas.drawPath(Path().apply(build), p)
+    }
+
+    private fun cloud(canvas: Canvas, x: Float, y: Float, s: Float, a: Int) {
+        p.shader = RadialGradient(x, y, s * 1.55f,
+            intArrayOf((a shl 24) or 0xFFFFFF, (a / 2 shl 24) or 0xE8FAFF, 0x00FFFFFF),
+            floatArrayOf(0f, .66f, 1f), Shader.TileMode.CLAMP)
+        canvas.drawOval(x - s * 1.8f, y - s * .34f, x + s * 1.8f, y + s * .55f, p)
+        canvas.drawCircle(x - s * .68f, y - s * .12f, s * .58f, p)
+        canvas.drawCircle(x, y - s * .42f, s * .77f, p)
+        canvas.drawCircle(x + s * .72f, y - s * .08f, s * .52f, p)
+        p.shader = null
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val w = width.toFloat()
-        val h = height.toFloat()
-        paint.shader = android.graphics.LinearGradient(0f, 0f, w * 0.85f, h,
-            intArrayOf(0xFF35C9E8.toInt(), 0xFF079CCB.toInt(), 0xFF0573A8.toInt(), 0xFF064F85.toInt()),
-            null, Shader.TileMode.CLAMP)
-        canvas.drawRect(0f, 0f, w, h, paint)
-        paint.shader = RadialGradient(w * 0.18f, h * 0.12f, w * 0.85f,
-            intArrayOf(0x99E8FFFF.toInt(), 0x3384E9FF, 0x0000A4D8), null, Shader.TileMode.CLAMP)
-        canvas.drawRect(0f, 0f, w, h, paint)
-        paint.shader = null
+        val w = width.toFloat(); val h = height.toFloat()
+        if (w <= 0f || h <= 0f) return
 
-        // Soft glossy wave along the lower half.
-        val wave = Path().apply {
-            moveTo(0f, h * 0.69f)
-            cubicTo(w * 0.22f, h * 0.58f, w * 0.40f, h * 0.82f, w * 0.66f, h * 0.72f)
-            cubicTo(w * 0.82f, h * 0.66f, w * 0.91f, h * 0.65f, w, h * 0.72f)
+        p.shader = android.graphics.LinearGradient(0f, 0f, w * .25f, h,
+            intArrayOf(0xFF68DDF0.toInt(), 0xFF29BFE1.toInt(), 0xFF078FC4.toInt(), 0xFF0875A9.toInt()),
+            floatArrayOf(0f, .36f, .72f, 1f), Shader.TileMode.CLAMP)
+        canvas.drawRect(0f, 0f, w, h, p)
+        p.shader = RadialGradient(w * .76f, h * .12f, w * .72f,
+            intArrayOf(0x99FFFFFF.toInt(), 0x44D9FFFF, 0x00FFFFFF),
+            floatArrayOf(0f, .48f, 1f), Shader.TileMode.CLAMP)
+        canvas.drawRect(0f, 0f, w, h, p); p.shader = null
+
+        cloud(canvas, w * .18f, h * .19f, w * .105f, 0x66)
+        cloud(canvas, w * .86f, h * .34f, w * .085f, 0x55)
+        cloud(canvas, w * .50f, h * .08f, w * .06f, 0x44)
+
+        shape(canvas, 0xFF73D69A.toInt()) {
+            moveTo(0f, h * .68f)
+            cubicTo(w * .17f, h * .56f, w * .30f, h * .61f, w * .45f, h * .69f)
+            cubicTo(w * .66f, h * .80f, w * .82f, h * .58f, w, h * .65f)
             lineTo(w, h); lineTo(0f, h); close()
         }
-        paint.shader = android.graphics.LinearGradient(0f, h * 0.64f, 0f, h,
-            intArrayOf(0x447BEEFF, 0x2266D5EF, 0x0058C4EA), null, Shader.TileMode.CLAMP)
-        canvas.drawPath(wave, paint)
-        paint.shader = null
-
-        // Bubbles and glossy highlights.
-        val bubbles = listOf(
-            floatArrayOf(0.88f, 0.13f, 0.10f), floatArrayOf(0.10f, 0.43f, 0.045f),
-            floatArrayOf(0.78f, 0.52f, 0.055f), floatArrayOf(0.23f, 0.84f, 0.07f),
-            floatArrayOf(0.92f, 0.88f, 0.035f), floatArrayOf(0.54f, 0.28f, 0.025f)
-        )
-        bubbles.forEachIndexed { index, bubble ->
-            val cx = w * bubble[0]
-            val cy = h * bubble[1]
-            val r = w * bubble[2]
-            paint.style = Paint.Style.FILL
-            paint.shader = RadialGradient(cx - r * 0.28f, cy - r * 0.35f, r * 1.3f,
-                intArrayOf(0x66FFFFFF, 0x22DFFFFF, 0x0879D8F0), floatArrayOf(0f, 0.55f, 1f), Shader.TileMode.CLAMP)
-            canvas.drawCircle(cx, cy, r, paint)
-            paint.shader = null
-            paint.style = Paint.Style.STROKE
-            paint.strokeWidth = maxOf(1f, density * 1.2f)
-            paint.color = 0x55FFFFFF
-            canvas.drawCircle(cx, cy, r, paint)
-            paint.style = Paint.Style.FILL
-            if (index % 2 == 0) {
-                paint.color = 0x66FFFFFF
-                canvas.drawOval(cx - r * 0.50f, cy - r * 0.64f, cx + r * 0.12f, cy - r * 0.44f, paint)
-            }
+        shape(canvas, 0xFF36B979.toInt()) {
+            moveTo(0f, h * .78f)
+            cubicTo(w * .20f, h * .67f, w * .36f, h * .82f, w * .56f, h * .77f)
+            cubicTo(w * .74f, h * .72f, w * .86f, h * .69f, w, h * .75f)
+            lineTo(w, h); lineTo(0f, h); close()
         }
-        paint.shader = null
+
+        p.shader = android.graphics.LinearGradient(0f, h * .79f, 0f, h,
+            intArrayOf(0xCC39C9E7.toInt(), 0xDD159BCB.toInt(), 0xFF0875A8.toInt()), null, Shader.TileMode.CLAMP)
+        val water = Path().apply {
+            moveTo(0f, h * .81f)
+            cubicTo(w * .22f, h * .75f, w * .43f, h * .86f, w * .63f, h * .80f)
+            cubicTo(w * .80f, h * .75f, w * .91f, h * .78f, w, h * .76f)
+            lineTo(w, h); lineTo(0f, h); close()
+        }
+        canvas.drawPath(water, p); p.shader = null
+
+        p.style = Paint.Style.STROKE; p.strokeCap = Paint.Cap.ROUND
+        for (i in 0..8) {
+            val y = h * (.84f + i * .018f)
+            p.strokeWidth = (1.2f + (i % 3)) * d
+            p.color = if (i % 2 == 0) 0x55FFFFFF else 0x338BFAFF
+            canvas.drawLine(w * (.08f + (i % 3) * .12f), y, w * (.50f + (i % 4) * .10f), y, p)
+        }
+        p.style = Paint.Style.FILL
+
+        val bubbles = listOf(
+            floatArrayOf(.91f, .16f, .055f), floatArrayOf(.08f, .47f, .034f),
+            floatArrayOf(.84f, .53f, .043f), floatArrayOf(.22f, .88f, .052f),
+            floatArrayOf(.94f, .91f, .025f), floatArrayOf(.57f, .28f, .020f),
+            floatArrayOf(.39f, .60f, .026f)
+        )
+        bubbles.forEach { b ->
+            val x = w * b[0]; val y = h * b[1]; val r = w * b[2]
+            p.shader = RadialGradient(x - r * .30f, y - r * .38f, r * 1.35f,
+                intArrayOf(0x88FFFFFF.toInt(), 0x33DFFFFF, 0x1179D8F0),
+                floatArrayOf(0f, .52f, 1f), Shader.TileMode.CLAMP)
+            canvas.drawCircle(x, y, r, p); p.shader = null
+            p.style = Paint.Style.STROKE; p.strokeWidth = maxOf(1f, d * 1.15f)
+            p.color = 0x77FFFFFF; canvas.drawCircle(x, y, r, p)
+            p.style = Paint.Style.FILL; p.color = 0x77FFFFFF
+            canvas.drawOval(x - r * .52f, y - r * .62f, x + r * .08f, y - r * .43f, p)
+        }
+
+        p.style = Paint.Style.STROKE; p.strokeWidth = 18f * d; p.color = 0x18FFFFFF
+        p.strokeCap = Paint.Cap.ROUND
+        val ribbon = Path().apply {
+            moveTo(-w * .10f, h * .42f)
+            cubicTo(w * .20f, h * .32f, w * .38f, h * .49f, w * .70f, h * .37f)
+            cubicTo(w * .88f, h * .30f, w * .98f, h * .34f, w * 1.12f, h * .27f)
+        }
+        canvas.drawPath(ribbon, p)
+        p.style = Paint.Style.FILL; p.shader = null
     }
 }
